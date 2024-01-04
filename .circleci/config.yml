@@ -52,8 +52,8 @@ jobs:
 workflows:
   frontend-pipeline:
     jobs:
-      - build-image-and-push-to-ecr:
-      
+      - build-image-and-push-to-ecr
+
       - build-image-and-push-to-dockerhub:
           requires:
             - build-image-and-push-to-ecr
