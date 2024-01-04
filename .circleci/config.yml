@@ -6,22 +6,6 @@ orbs:
 
 jobs:
 
-# Building a docker image with a dockerfile (provided) and testing the image with maven tests:
-
-  build-and-test:
-    working_directory: ~/ce-team-project-frontend # change to the working directory that your dockerfile is located in
-    docker:
-      - image: cimg/openjdk:17.0.7
-
-    steps:
-      - checkout
-      - run:
-          name: Build
-          command: mvn -B -DskipTests clean package
-          working_directory: ~/ce-team-project-frontend # change to the working directory where your maven tests are located.
-
-
-
 # Building a docker image with a provided docker file and pushing the image to the amazon elastic container repository.
 
   build-image-and-push-to-ecr:
@@ -66,12 +50,10 @@ jobs:
 # The workflow below is the order in which the pipeline is executed:
 
 workflows:
-  backend-pipeline:
+  frontend-pipeline:
     jobs:
-      - build-and-test
       - build-image-and-push-to-ecr:
-          requires: 
-            - build-and-test 
+      
       - build-image-and-push-to-dockerhub:
           requires:
             - build-image-and-push-to-ecr
