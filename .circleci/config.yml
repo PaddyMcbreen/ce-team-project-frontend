@@ -1,0 +1,85 @@
+version: 2.1
+
+orbs:
+  aws-ecr: circleci/aws-ecr@8.2.1
+  docker: circleci/docker@2.4.0
+
+jobs:
+
+# Building a docker image with a dockerfile (provided) and testing the image with maven tests:
+
+  build-and-test:
+    working_directory: ~/ce-team-project-frontend # change to the working directory that your dockerfile is located in.
+    docker:
+      - image: cimg/openjdk:17.0.7
+
+    steps:
+      - checkout
+      - run:
+          name: Build
+          command: mvn -B -DskipTests clean package
+          working_directory: ~/ce-team-project-frontend # change to the working directory where your maven tests are located.
+
+      - run:
+          name: Test
+          command: mvn test
+          working_directory: ~/ce-team-project-frontend # change to the working directory where your maven tests are located.
+
+
+
+# Building a docker image with a provided docker file and pushing the image to the amazon elastic container repository.
+
+  build-image-and-push-to-ecr:
+    working_directory: ~/ce-team-project-frontend # change to the working directory where your dockerfile is.
+    docker:
+      - image: cimg/aws:2023.05
+    steps:
+      - setup_remote_docker 
+      - aws-ecr/build-and-push-image:
+          repo: frontend-project # Change to the name of the repo you created on AWS ECR.
+          path: "." # This is the directory to look for the Dockerfile
+          build-path: "." # This is directory for Docker to load the build path to source code
+          tag: ${CIRCLE_BUILD_NUM} 
+          public-registry-alias: v5g0a1h5 # Change to the public registry alaias of your aws account
+          public-registry: true
+
+# Building a docker image with the a dockerfile and pushing the image to a dockerhub repository.
+  build-image-and-push-to-dockerhub:
+    working_directory: ~/ce-team-project-frontend # Change to the working deirectory where your dockerfile can be found.
+    docker:
+      - image: cimg/aws:2023.05
+
+    steps:
+      - checkout
+
+      - setup_remote_docker
+
+      - docker/check:
+       # Create the environment variables in your circleCi account
+          docker-username: DOCKERHUB_LOGIN 
+          docker-password: DOCKERHUB_PASSWORD  
+          
+      - run:
+          name: Build and Push Docker Image
+          # Change the commands below to match your docker repo and image names
+          command: |
+            docker build -t paddymcbreen/frontend-project:latest . 
+            docker tag paddymcbreen/frontend-project:latest paddymcbreen/frontend-project:${CIRCLE_BUILD_NUM}
+            docker push paddymcbreen/frontend-project:${CIRCLE_BUILD_NUM}
+          
+
+# The workflow below is the order in which the pipeline is executed:
+
+workflows:
+  backend-pipeline:
+    jobs:
+      - build-and-test
+      - build-image-and-push-to-ecr:
+          requires: 
+            - build-and-test 
+      - build-image-and-push-to-dockerhub:
+          requires:
+            - build-image-and-push-to-ecr
+
+
+   
