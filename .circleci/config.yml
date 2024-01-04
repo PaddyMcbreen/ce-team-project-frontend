@@ -9,7 +9,7 @@ jobs:
 # Building a docker image with a dockerfile (provided) and testing the image with maven tests:
 
   build-and-test:
-    working_directory: ~/ce-team-project-frontend # change to the working directory that your dockerfile is located in.
+    working_directory: ~/ce-team-project-frontend # change to the working directory that your dockerfile is located in
     docker:
       - image: cimg/openjdk:17.0.7
 
