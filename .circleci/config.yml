@@ -15,7 +15,7 @@ jobs:
     steps:
       - setup_remote_docker 
       - aws-ecr/build-and-push-image:
-          repo: frontend-project # Change to the name of the repo you created on AWS ECR
+          repo: frontend-project # Change to the name of the repo you created on AWS ECR.
           path: "." # This is the directory to look for the Dockerfile
           build-path: "." # This is directory for Docker to load the build path to source code
           tag: ${CIRCLE_BUILD_NUM} 
