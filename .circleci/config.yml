@@ -6,7 +6,7 @@ orbs:
 
 jobs:
 
-# Building a docker image with a provided docker file and pushing the image to the amazon elastic container repository.
+# Building a docker image with a provided docker file and pushing the image to the amazon elastic container repository
 
   build-image-and-push-to-ecr:
     working_directory: ~/ce-team-project-frontend # change to the working directory where your dockerfile is.
